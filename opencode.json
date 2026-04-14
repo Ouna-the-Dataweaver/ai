@@ -1,0 +1,176 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "MiniMax_understand_image*": "deny",
+	"exa*": "deny",
+    "tavily*": "deny",
+    "brave*": "deny",
+	"zai-zread*": "deny",
+	"zai-web-reader": "deny",
+	"context7": "deny"
+  },
+  "agent": {
+    "explore": {
+      "model": "opencode-go/minimax-m2.7"
+    },
+	"search": {
+      "description": "Agent focused on web search for fresh actual answers",
+      "mode": "all",
+	  "model": "opencode-go/minimax-m2.7",
+      "color": "info",
+      "prompt": "{file:./prompts/search.txt}",
+      "steps": 10,
+      "tools": {
+        "exa*": true,
+        "tavily*": true,
+		"tavily_tavily_research": false,
+        "tavily_tavily_crawl": false,
+        "tavily_tavily_map": false,
+		"tavily_tavily_skill": false,
+        "brave*": true,
+		"brave_brave_summarizer": false,
+        "brave_brave_local_search": false,
+        "brave_brave_video_search": false,
+        "brave_brave_image_search": false,
+		"zai-zread*": true,
+	    "zai-web-reader": true,
+	    "context7": true,
+        "write": false,
+        "edit": false
+      },
+      "permission": {
+        "edit": "deny",
+        "bash": "deny",
+        "webfetch": "allow",
+		"MiniMax_*": "deny"
+      }
+    },
+	"context": {
+      "description": "Agent for preparation for ChatGPT/gemini questions",
+      "mode": "primary",
+	  "model": "opencode-go/minimax-m2.7",
+      "color": "#de9dfc",
+      "prompt": "{file:./prompts/context.txt}",
+      "steps": 20,
+      "tools": {
+        "write": false,
+        "edit": false
+      },
+      "permission": {
+        "edit": "deny",
+        "webfetch": "allow",
+		"MiniMax_*": "deny"
+      }
+    },
+	"deepsearch": {
+      "description": "Agent focused on deep research for topics",
+      "mode": "primary",
+	  "model": "opencode-go/minimax-m2.7",
+      "color": "info",
+      "prompt": "{file:./prompts/deepsearch.txt}",
+      "steps": 50,
+      "tools": {
+        "exa*": true,
+        "tavily*": true,
+		"tavily_tavily_research": false,
+        "tavily_tavily_crawl": false,
+        "tavily_tavily_map": false,
+		"tavily_tavily_skill": false,
+        "brave*": true,
+		"brave_brave_summarizer": false,
+        "brave_brave_local_search": false,
+        "brave_brave_video_search": false,
+        "brave_brave_image_search": false,
+		"zai-zread*": true,
+	    "zai-web-reader": true,
+	    "context7": true,
+        "write": false,
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "deny",
+        "webfetch": "allow",
+		"MiniMax_*": "deny",
+		"task": {
+		  "search": "deny",
+		}
+      }
+    }
+  },
+  "provider": {
+	"Minimax_direct": {
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "https://api.minimax.io/anthropic/v1",
+        "apiKey": "YOUR_MINIMAX_API_KEY"
+      },
+      "models": {
+        "MiniMax-M2.7": {
+          "name": "MiniMax-M2.7"
+        }
+      }
+    }
+  },
+  "experimental": {
+    "mcp_timeout": 3600000
+  },
+  "mcp": {
+    "MiniMax": {
+      "type": "local",
+      "command": ["uvx", "minimax-coding-plan-mcp"],
+      "enabled": true,
+      "environment": {
+        "MINIMAX_API_KEY": "YOUR_MINIMAX_API_KEY",
+        "MINIMAX_MCP_BASE_PATH": "/home/theio/mcp/minimax",
+        "MINIMAX_API_HOST": "https://api.minimax.io",
+        "MINIMAX_API_RESOURCE_MODE": "url"
+      }
+    },
+	"zai-vision": {
+	  "type": "local",
+      "command": ["npx", "-y", "@z_ai/mcp-server@latest"],
+	  "timeout": 60000,
+      "environment": {
+        "Z_AI_API_KEY": "YOUR_Z_AI_API_KEY",
+        "Z_AI_MODE": "ZAI"
+      }
+	},
+	"zai-zread": {
+	  "type": "remote",
+	  "url": "https://api.z.ai/api/mcp/zread/mcp",
+	  "headers": {
+		"Authorization": "Bearer YOUR_Z_AI_API_KEY"
+	  }
+    },
+	"zai-web-reader": {
+	  "type": "remote",
+	  "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+	    "headers": {
+	      "Authorization": "Bearer YOUR_Z_AI_API_KEY"
+		}
+	},
+	"exa": {
+	  "type": "remote",
+      "url": "https://mcp.exa.ai/mcp?exaApiKey=YOUR_EXA_API_KEY"
+    },
+	"tavily": {
+	  "type": "remote",
+      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey=YOUR_TAVILY_API_KEY"
+    },
+	"brave": {
+      "type": "local",
+      "command": ["npx", "-y", "@brave/brave-search-mcp-server", "--transport", "stdio"],
+      "timeout": 60000,
+      "environment": {
+        "BRAVE_API_KEY": "YOUR_BRAVE_API_KEY"
+      }
+    },
+	"context7": {
+	  "type": "remote",
+	  "url": "https://mcp.context7.com/mcp",
+	  "headers": {
+        "CONTEXT7_API_KEY": "YOUR_CONTEXT7_API_KEY"
+	  }
+    }
+  }
+}
